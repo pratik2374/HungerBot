@@ -17,6 +17,7 @@ import seaborn as sns
 import io
 import re
 import datetime
+from llama_index.core.base.llms.types import ChatMessage, MessageRole
 import glob
 
 # Set OpenAI API key from secrets
@@ -417,16 +418,16 @@ else :
     # Helper: Build chat history for LLM context
     def build_llm_chat_history(messages, max_turns=5):
         """
-        Returns a list of dicts for the last max_turns Q&A pairs, formatted for OpenAI/chat LLMs.
+        Converts Streamlit-style messages into LlamaIndex-compatible ChatMessage objects.
+        Only keeps the last `max_turns` user-assistant pairs.
         """
-        # Only keep the last max_turns*2 messages (user+assistant)
-        history = messages[-max_turns*2:]
+        history = messages[-max_turns*2:]  # Keep last N pairs
         chat = []
         for msg in history:
             if msg["role"] == "user":
-                chat.append({"role": "user", "content": msg["content"]})
+                chat.append(ChatMessage(role=MessageRole.USER, content=msg["content"]))
             elif msg["role"] == "assistant":
-                chat.append({"role": "assistant", "content": msg["content"]})
+                chat.append(ChatMessage(role=MessageRole.ASSISTANT, content=msg["content"]))
         return chat
 
     # Update agent initialization to use the new dynamic prompt
