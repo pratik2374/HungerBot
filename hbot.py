@@ -468,7 +468,7 @@ else :
         handler = agent.run(
             prompt,
             ctx=st.session_state.ctx,
-            stepwise=False,
+            #stepwise=False,
             chat_history=chat_history  # Pass chat history to the agent/LLM
         )
 
