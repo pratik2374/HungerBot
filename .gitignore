@@ -8,3 +8,27 @@ hungerbot.ipynb
 product_name.py
 sum.py
 .env
+claude.py
+config.toml
+dataextract.py
+.gitignore
+HB_final_f6360f27.csv
+HBdata_12061046.csv
+HBox_sales_data.csv
+k.md
+matplot.py
+samle 3 row
+samle 3 row.csv
+similar.py
+similar2.py
+similar3.py
+similar4.py
+similar5.py
+__pycache__/classi.cpython-312.pyc
+__pycache__/test.cpython-312.pyc
+product_store/default__vector_store.json
+product_store/docstore.json
+product_store/graph_store.json
+product_store/image__vector_store.json
+product_store/index_store.json
+new_hbot.py
