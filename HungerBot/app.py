@@ -30,7 +30,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
 
-from HungerBot.test import gen_plot
+from graph import gen_plot
 
 
 # Set OpenAI API key from secrets
@@ -384,13 +384,15 @@ else :
             "rewrite the question to explicitly request all relevant details for any entity (such as product, vendor, customer, etc.), "
             "including IDs, names, dates, and values. "
             "If the question is ambiguous, make it specific and multi-step if needed. "
+            "** IMPORTANT** - only use the colomns as mentioned below :"
             "Columns available: " + ", ".join(df.columns) + "."
+
         )
         # Use your OpenAI LLM (or any LLM you have) to rewrite the query
         llm = OpenAI(model="gpt-4o")  # or your preferred model
         response = llm.complete(
             prompt=f"{system_prompt}\nUser question: {user_query}\nOptimized query:",
-            max_tokens=128,
+            max_tokens=2000,
             temperature=0.2,
             stop=["\n\n"]
         )
