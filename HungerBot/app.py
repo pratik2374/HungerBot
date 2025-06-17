@@ -194,7 +194,7 @@ else :
     def is_visualization_query(query: str) -> bool:
         """Detect if the query is asking for a visualization."""
         viz_keywords = [
-            "plot", "chart", "graph", "visualize", "visualization", "draw", "histogram", "bar", "line", "scatter", "pie"
+            "plot", "chart", "graph", "visualize", "visualization", "draw", "histogram", "bar", "line", "scatter", "pie", "heatmap"
         ]
         return any(word in query.lower() for word in viz_keywords)
 
