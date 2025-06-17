@@ -91,7 +91,7 @@ Please provide a JSON response with the following structure:
     "columns": ["list", "of", "column", "names"],
     "aggregation": "sum/count/mean/median/none",
     "reasoning": "brief explanation of your choice",
-    "code_suggestion": "brief pandas/plotly code suggestion"
+    "code_suggestion": "complete plotly code to achive this, and just given code no heading, from first line write code, and dont include .show() in the end"
 }}
 
 Choose the most appropriate visualization based on:
@@ -172,20 +172,22 @@ Response (JSON only):
             "code_suggestion": ""
         }
     
-def execute_plotly_code(code: str):
+def execute_plotly_code_with_df(code, df):
     """
-    Executes LLM-generated Plotly code and returns the figure object.
+    Executes LLM-generated Plotly code with dataframe context.
     
     Args:
-        code (str): The Python code that creates a Plotly graph and stores it in a variable named `fig`.
-
+        code (str): The Python code that creates a Plotly graph
+        df (pd.DataFrame): The dataframe to work with
+        
     Returns:
-        plotly.graph_objects.Figure or str: The resulting Plotly figure, or error message.
+        plotly.graph_objects.Figure or str: The resulting figure or error message
     """
-    local_vars = {}
+    local_vars = {"df": df}  # Make df available in the execution context
     global_vars = {
         "go": go,
-        "px": px
+        "px": px,
+        "pd": pd,
     }
     
     stdout = io.StringIO()
@@ -201,22 +203,36 @@ def execute_plotly_code(code: str):
     
     return fig
 
+
 class AdvancedChartGenerator:
     """Enhanced chart generator with LLM insights"""
     
     def __init__(self, df: pd.DataFrame):
         self.df = df
     
-    def generate_chart_from_llm_analysis(self, analysis: Dict) -> go.Figure:
+    def generate_chart_from_llm_analysis(self, analysis):
         """Generate chart based on LLM analysis"""
         chart_type = analysis.get('chart_type', 'bar')
         columns = analysis.get('columns', [])
         aggregation = analysis.get('aggregation', 'count')
         code = analysis.get("code_suggestion")
-        # try :
-        #     return execute_plotly_code(code)
-        # except:
-        #     print("error in exceuting generated on ")
+        print(code)
+
+        if not code:
+            return "❌ No code suggestion provided in analysis"
+
+        try:
+            # Pass the dataframe to the execution context
+            fig = execute_plotly_code_with_df(code, self.df)
+            
+            # Check if execution returned an error string
+            if isinstance(fig, str):
+                return fig  # Return the error message
+                
+            return fig
+            
+        except Exception as e:
+            print(f"❌ Error in generate_chart_from_llm_analysis: {e}")
         
         if not columns:
             return self._create_error_chart("No columns specified by LLM")
@@ -431,8 +447,16 @@ def get_column_info(df: pd.DataFrame) -> Dict:
 
     
 def gen_plot(df, query):
+    """
+    Generate plot from dataframe and query
+    """
     llm_provider = "openai"
-    if df is not None:
+    
+    if df is None:
+        return None, "❌ Input DataFrame is None."
+    
+    try:
+        # Assuming these classes/functions exist in your codebase
         llm_processor = LLMQueryProcessor(llm_provider)
         column_info = get_column_info(df)
         analysis = llm_processor.analyze_query_with_llm(query, column_info)
@@ -442,7 +466,22 @@ def gen_plot(df, query):
 
         chart_generator = AdvancedChartGenerator(df)
         fig = chart_generator.generate_chart_from_llm_analysis(analysis)
+        
+        # Check if fig is an error string
+        if isinstance(fig, str):
+            return None, fig
+        
+        # Only call show() if fig is actually a figure object
+        if hasattr(fig, 'show'):
+            fig.show()
+        else:
+            return None, f"❌ Unexpected return type: {type(fig)}"
+            
         response = analysis.get("reasoning", "No reasoning provided.")
         return fig, str(response)
+        
+    except Exception as e:
+        return None, f"❌ Error in gen_plot: {e}"
 
-    return None, "❌ Input DataFrame is None."
+# df = pd.read_csv("HungerBox_sales_data.csv")
+# fig, response = gen_plot(df, "make a pie chart on vendor id and sales")
