@@ -464,7 +464,7 @@ def gen_plot(df, query):
         
         # Only call show() if fig is actually a figure object
         if hasattr(fig, 'show'):
-            fig.show()
+            print("chart generated")
         else:
             return None, f"❌ Unexpected return type: {type(fig)}"
             
