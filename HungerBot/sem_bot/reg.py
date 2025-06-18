@@ -5,7 +5,7 @@ from difflib import SequenceMatcher
 def load_list_from_txt(filename):
     with open(filename, 'r', encoding='utf-8') as f:
         return [line.strip() for line in f.readlines()]
-sample_products = load_list_from_txt("unique_products.txt")
+sample_products = load_list_from_txt('unique_products.txt')
 print(f"Loaded {len(sample_products)} products from file.")
                  
 
