@@ -29,15 +29,6 @@ class LLMQueryProcessor:
                 print("OpenAI package not installed. Run: pip install openai")
             except:
                 print("OpenAI API key not configured. Add to Streamlit secrets.")
-                
-        elif self.provider == "anthropic":
-            try:
-                import anthropic
-                self.client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
-            except ImportError:
-                print("Anthropic package not installed. Run: pip install anthropic")
-            except:
-                print("Anthropic API key not configured. Add to Streamlit secrets.")
             
     
     def analyze_query_with_llm(self, query: str, df_info: Dict) -> Dict:

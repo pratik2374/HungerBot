@@ -33,9 +33,6 @@ import rapidfuzz
 from rapidfuzz import process as rapidfuzz_process 
 
 from graph import gen_plot
-from to_check_type import classify
-
-
 
 # Set OpenAI API key from secrets
 os.environ['OPENAI_API_KEY'] = st.secrets["openai_api_key"]
@@ -57,7 +54,7 @@ if "messages" not in st.session_state:
     st.session_state.chat_history = [] # For keeping chat history
 
 # Title and description
-st.title("📊 Data Analysis Chatbot")
+st.title("📊 HungerBot v1806")
 st.markdown("Ask questions about your data and get instant insights!")
 
 # Sidebar instructions
@@ -67,14 +64,19 @@ with st.sidebar:
     ### Instructions:
     1. Upload your CSV or Excel file using the file uploader below
     2. Supported formats: CSV (.csv) and Excel (.xls, .xlsx)
-    3. Make sure your data is clean and properly formatted
-    4. Maximum file size: 200MB
-    
-    ### Tips:
-    - For best results, ensure your data has clear column headers
-    - Remove any unnecessary columns before uploading
-    - Check for missing values in your dataset
     """)
+
+    st.sidebar.title("💡 Example Prompts")
+    example_prompts = [
+        "List the top five vendors by orders",
+        "Make a bar graph on sales with order date",
+        "Peak sales hours of April 28, 2025",
+        "Make a pie chart with vendor_id and sales",
+        "Give me the least sold item name by orders"
+    ]
+
+    for prompt in example_prompts:
+        st.sidebar.code(prompt, language='')  # empty language = plain text
 
     file = st.file_uploader(
         "Upload your data file",
@@ -142,6 +144,7 @@ else :
                 st.error("Unsupported file format in dataset folder.")
                 st.stop()
             st.session_state.df_loaded = True
+            df = preprocess_datetime_columns(df)
             return df
             
     # --- END: Load the selected dataset ---
@@ -175,7 +178,6 @@ else :
     #     main_df = preprocess_datetime_columns(df)
 
     df = load_csv()
-
     # -- NEW: Initialize the PandasQueryEngine and vector Store Engine with the loaded DataFrame --
     query_engine = PandasQueryEngine(
         df=df,
@@ -490,7 +492,7 @@ else :
         system_prompt=get_system_prompt(df)
     )
 
-    st.session_state.ctx = Context(agent)
+    ctx = Context(agent)
 
     # --- Update optimize_query_with_llm to use entity resolution ---
     def optimize_query_with_llm(user_query: str, df: pd.DataFrame) -> str:
@@ -540,7 +542,7 @@ else :
         # The agent.run method should accept a chat history if supported
         handler = agent.run(
             prompt,
-            ctx=st.session_state.ctx,
+            ctx=ctx,
             #stepwise=False,
             chat_history=msg_history  # Pass chat history to the agent/LLM
         )

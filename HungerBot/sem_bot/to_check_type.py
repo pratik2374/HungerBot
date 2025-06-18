@@ -35,21 +35,19 @@ class OueryClassifier:
         # Create the prompt
         # prompt = self._create_analysis_prompt(query, df_context)
         prompt = self._create_analysis_prompt(query)
-        print(prompt)
+        #print(prompt)
         
         try:
             if self.provider == "openai" and self.client:
                 response = self._query_openai(prompt)
-            elif self.provider == "anthropic" and self.client:
-                response = self._query_anthropic(prompt)
             else:
                 # Fallback to rule-based
                 return self._fallback_analysis(query)
-            print(response)
+            #print(response)
             return self._parse_llm_response(response)
             
         except Exception as e:
-            print(f"LLM Error: {e}")
+            #print(f"LLM Error: {e}")
             return self._fallback_analysis(query)
     
     # def _create_dataframe_context(self, df_info: Dict) -> str:
