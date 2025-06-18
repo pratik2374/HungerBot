@@ -1,0 +1,12 @@
+streamlit
+plotly
+streamlit
+pandas 
+llama-index 
+openai
+llama_index.experimental
+matplotlib
+seaborn
+tabulate
+numpy
+rapidfuzz
